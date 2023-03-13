@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  db:
+    container_name: db
+    hostname: db
+    image: postgres:11-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - liquinet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  lb:
+    depends_on:
+      db:
+        condition: service_healthy
+    container_name: lb
+    image: liquibase/liquibase
+    command: --url="jdbc:postgresql://db:5432/postgres" --changeLogFile=changelog.xml --username=postgres --password=postgres --logLevel=debug update
+    volumes:
+      - ./config/changelog.xml:/liquibase/changelog.xml
+      - ./scripts:/liquibase/scripts
+    networks:
+      - liquinet
+networks:
+  liquinet:
+volumes:
+  dbdata:

@@ -1,0 +1,31 @@
+name: Liquibase Update
+on:
+  workflow_dispatch:
+  push:
+jobs:
+  update-db:
+    runs-on: ubuntu-latest
+    env:
+      DB_HOST: db
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    steps: 
+    - uses: actions/checkout@v3
+    
+    - name: Run liquibase in docker
+      run: docker compose up -d
+
+    - name: Test results
+      shell: pwsh
+      run: |
+         docker exec db psql -U postgres -c "select * from customers" | Out-String | Should -Match Doe
+         docker exec db psql -U postgres -c "select * from orders" | Out-String | Should -Match Main
+
+    - name: Execute postgres query
+      shell: pwsh
+      run: |
+         docker exec db psql -U postgres -c "select * from customers"
+         docker exec db psql -U postgres -c "select * from orders"
+    
