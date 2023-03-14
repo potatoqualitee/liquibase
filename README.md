@@ -12,6 +12,7 @@ git clone https://www.github.com/potatoqualitee/liquibase
 cd liquibase
 
 # start the containers which creates some tables and makes some changes
+# All scripts in the scripts folder will be executed on the target db
 docker compose up -d
 
 # see the results
@@ -21,6 +22,4 @@ docker exec db psql -U postgres -c "select * from customers;"
 docker compose down --volumes
 ```
 
-All scripts inside /scripts folder will be executed on target database
-
-Check out the [Liquibase toolbox](https://github.com/liquibase/liquibase-toolbox) for more scripts.
+Check out the [Liquibase toolbox](https://github.com/liquibase/liquibase-toolbox) for more scripts. Thanks to [@marcoslobo](https://github.com/marcoslobo/poc.liquibase) for the base of this POC repo.
